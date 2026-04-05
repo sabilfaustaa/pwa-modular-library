@@ -64,3 +64,6 @@ export type {
 export { DefaultNotificationManager, useNotification } from "./notification";
 
 export type { NotificationManager, ShowNotificationOptions, UseNotificationReturn } from "./notification";
+
+export { DefaultServiceWorkerManager, useServiceWorker } from "./service-worker";
+export type { ServiceWorkerManager } from "./service-worker";
