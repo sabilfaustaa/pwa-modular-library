@@ -28,6 +28,8 @@ export {
 
 export { usePWA } from "./modules/usePWA";
 export { useCapability } from "./modules/useCapability";
+export { createPWA } from "./modules/createPWA";
+export type { PWARuntime } from "./modules/createPWA";
 
 export type { StorageAdapter } from "./storage/adapter";
 
