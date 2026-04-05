@@ -6,6 +6,7 @@ import { useStorage } from "../storage/useStorage";
 import { useSync } from "../sync/useSync";
 import type { SyncTask } from "../sync/types";
 import { useCapability } from "./useCapability";
+import { useNotification } from "../notification/useNotification";
 
 export interface PWARuntime {
   core: CoreModule;
@@ -15,6 +16,7 @@ export interface PWARuntime {
   cache: ReturnType<typeof useCache>;
   storage: ReturnType<typeof useStorage<SyncTask>>;
   sync: ReturnType<typeof useSync>;
+  notification: ReturnType<typeof useNotification>;
 }
 
 export function createPWA(config?: PWAConfig): PWARuntime {
@@ -23,6 +25,7 @@ export function createPWA(config?: PWAConfig): PWARuntime {
   const sync = useSync(storage, core.config.sync);
   const cache = useCache(core.config.cache);
   const capability = useCapability();
+  const notification = useNotification(core.config.notification);
 
   return {
     core,
@@ -32,5 +35,6 @@ export function createPWA(config?: PWAConfig): PWARuntime {
     cache,
     storage,
     sync,
+    notification,
   };
 }

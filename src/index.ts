@@ -60,3 +60,7 @@ export type {
   StrategyResult,
   UseCacheReturn,
 } from "./cache";
+
+export { DefaultNotificationManager, useNotification } from "./notification";
+
+export type { NotificationManager, ShowNotificationOptions, UseNotificationReturn } from "./notification";

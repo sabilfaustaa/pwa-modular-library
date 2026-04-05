@@ -21,6 +21,7 @@ describe("createPWA", () => {
     expect(pwa.cache).toBeDefined();
     expect(pwa.storage).toBeDefined();
     expect(pwa.sync).toBeDefined();
+    expect(pwa.notification).toBeDefined();
   });
 
   it("should initialize CoreModule with provided config", () => {
