@@ -1,22 +1,21 @@
-# 🚀 Modular PWA Library
+# 🚀 PWA Modular Library (Vue 3 + TypeScript)
 
-A modular Progressive Web App (PWA) library built with TypeScript, designed to simplify caching, storage, and background synchronization through a unified and scalable architecture.
+Library modular untuk mempercepat pengembangan **Progressive Web Apps (PWA)** berbasis Vue 3 dan TypeScript.
+
+Dirancang dengan pendekatan **modular architecture**, library ini menyediakan abstraction layer untuk fitur inti PWA seperti caching, storage, background sync, notification, dan service worker.
 
 ---
 
 ## ✨ Features
 
-- 🧩 Modular architecture (cache, storage, sync)
-- ⚙️ Centralized configuration via Core Module
-- 📦 IndexedDB storage abstraction
-- 🔄 Background sync queue with retry mechanism
-- 🌐 Advanced caching strategies:
-  - Cache First
-  - Network First
-  - Stale While Revalidate
-
-- 🧠 Capability detection (browser support)
-- 🏗️ Unified API via `createPWA()`
+- ⚡ Modular architecture (plug & play)
+- 📦 Cache strategies (Cache First, Network First, SWR)
+- 💾 IndexedDB storage abstraction
+- 🔄 Background sync queue
+- 🔔 Notification API wrapper
+- ⚙️ Service Worker manager
+- 🧠 Capability detection
+- 🧪 Fully tested (Vitest)
 
 ---
 
@@ -26,67 +25,56 @@ A modular Progressive Web App (PWA) library built with TypeScript, designed to s
 npm install pwa-modular-library
 ```
 
-> (Temporary: local development build)
-
 ---
 
 ## 🚀 Quick Start
-
-### Initialize PWA Runtime
 
 ```ts
 import { createPWA } from "pwa-modular-library";
 
 const pwa = createPWA({
-  cache: {
-    cacheName: "app-cache",
+  serviceWorker: {
+    enabled: true,
+    url: "/service-worker.js",
   },
-  storage: {
-    dbName: "app-db",
-    storeName: "store",
-  },
-  sync: {
-    maxRetries: 5,
-    retryDelay: 2000,
+  notification: {
+    requestPermissionOnInit: true,
   },
 });
-```
 
----
-
-### Use Modules
-
-```ts
 // Cache
-await pwa.cache.fetchWithStrategy("/api/data");
+await pwa.cache.set("key", new Response("data"));
 
 // Storage
-await pwa.storage.set("key", { value: 123 });
+await pwa.storage.set("user", { name: "Usbul" });
 
 // Sync
-pwa.sync.enqueue({
+await pwa.sync.add({
   id: "task-1",
-  payload: { foo: "bar" },
+  payload: { data: 123 },
 });
+
+// Notification
+await pwa.notification.show("Hello", {
+  body: "Welcome back!",
+});
+
+// Service Worker
+await pwa.serviceWorker.register();
 ```
 
 ---
 
-## 🧱 Architecture Overview
+## 🧩 Architecture
 
-```
-CoreModule
- ├── Cache Module
- ├── Storage Module (IndexedDB)
- ├── Sync Module
- └── Capability Module
-```
+Library terdiri dari beberapa module utama:
 
-All modules are:
-
-- Independently usable
-- Configurable
-- Integrated via unified factory (`createPWA`)
+- Core Module
+- Cache Module
+- Storage Module
+- Sync Module
+- Notification Module
+- Service Worker Module
 
 ---
 
@@ -94,17 +82,23 @@ All modules are:
 
 ```ts
 createPWA({
+  serviceWorker: {
+    enabled: true,
+    url: "/sw.js",
+  },
   cache: {
-    cacheName: "custom-cache",
-    defaultStrategy: "network-first",
+    defaultCacheName: "app-cache",
   },
   storage: {
-    dbName: "my-db",
-    storeName: "my-store",
+    dbName: "app-db",
+    storeName: "app-store",
   },
   sync: {
     maxRetries: 3,
     retryDelay: 1000,
+  },
+  notification: {
+    requestPermissionOnInit: true,
   },
 });
 ```
@@ -117,57 +111,29 @@ createPWA({
 npm run test
 ```
 
-Includes:
-
-- Core module tests
-- Cache strategies tests
-- Storage (IndexedDB) tests
-- Sync queue tests
-
 ---
 
-## 📌 Current Status
+## 📚 Documentation
 
-🚧 In Active Development
-
-### Completed
-
-- Core Module
-- Cache Module
-- Storage Module
-- Sync Module
-- Config Integration
-- Unified API (`createPWA`)
-
-### Upcoming
-
-- 🔔 Notification Manager
-- ⚙️ Service Worker Manager
-- 📚 Full Documentation
-- 🔌 Vue Plugin Integration
+Lihat folder `/docs` untuk dokumentasi lengkap tiap module.
 
 ---
 
 ## 🎯 Use Case
 
-Designed for:
+Library ini digunakan dalam studi kasus:
 
-- Offline-first applications
-- Progressive Web Apps (PWA)
-- Modular frontend architecture
-- Systems requiring reliable data sync (e.g., online exam systems)
+> Sistem Ujian Online berbasis PWA
+> dengan dukungan offline mode, sync, dan caching.
 
 ---
 
-## 🧠 Design Philosophy
+## 🧑‍💻 Author
 
-- **Modular First**
-- **Config Driven**
-- **Framework Agnostic**
-- **Scalable Architecture**
+Developed by Usbul 🚀
 
 ---
 
 ## 📄 License
 
-MIT License
+MIT
