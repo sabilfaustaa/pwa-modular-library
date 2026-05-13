@@ -1,15 +1,31 @@
 type CacheStore = Map<string, Response>;
 
 function toAbsoluteUrl(input: string): string {
-  return new URL(input, "http://localhost").toString();
+  const base = "http://localhost";
+  try {
+    const url = new URL(input, base);
+    // Strip default port for consistency
+    if (
+      (url.protocol === "http:" && (url.port === "80" || url.port === "")) ||
+      (url.protocol === "https:" && (url.port === "443" || url.port === ""))
+    ) {
+      url.port = "";
+    }
+    return url.toString();
+  } catch {
+    return `${base}${input.startsWith("/") ? input : `/${input}`}`;
+  }
 }
 
+/**
+ * Normalisasi key untuk simpan di Map.
+ */
 function normalizeRequestKey(input: RequestInfo | URL): string {
-  if (input instanceof Request) {
+  if (typeof Request !== "undefined" && input instanceof Request) {
     return `${input.method.toUpperCase()}:${input.url}`;
   }
 
-  if (input instanceof URL) {
+  if (typeof URL !== "undefined" && input instanceof URL) {
     return `GET:${input.toString()}`;
   }
 
@@ -118,7 +134,18 @@ class MockCacheStorage implements CacheStorage {
   }
 }
 
+let originalCachesDescriptor: PropertyDescriptor | undefined;
+
 export function installMockCacheStorage(): MockCacheStorage {
+  // Simpan descriptor asli (happy-dom punya native caches)
+  if (originalCachesDescriptor === undefined) {
+    originalCachesDescriptor = Object.getOwnPropertyDescriptor(globalThis, "caches");
+    // Jika tidak ada own descriptor, catat sebagai null (caches dari prototype)
+    if (originalCachesDescriptor === undefined) {
+      originalCachesDescriptor = null as unknown as PropertyDescriptor;
+    }
+  }
+
   const mockCacheStorage = new MockCacheStorage();
 
   Object.defineProperty(globalThis, "caches", {
@@ -131,5 +158,11 @@ export function installMockCacheStorage(): MockCacheStorage {
 }
 
 export function uninstallMockCacheStorage(): void {
-  Reflect.deleteProperty(globalThis, "caches");
+  if (originalCachesDescriptor === null) {
+    // Tidak ada own descriptor sebelumnya — hapus saja
+    Reflect.deleteProperty(globalThis, "caches");
+  } else if (originalCachesDescriptor !== undefined) {
+    // Restore descriptor asli
+    Object.defineProperty(globalThis, "caches", originalCachesDescriptor);
+  }
 }
