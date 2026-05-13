@@ -13,7 +13,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "sideEffects": false,
   "scripts": {
