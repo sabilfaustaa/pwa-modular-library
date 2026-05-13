@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { DefaultCacheManager } from "../../src/cache/manager";
-import { cacheFirst, networkFirst, staleWhileRevalidate } from "../../src/cache/strategies";
+import { DefaultCacheManager } from "../../src/modules/caching/manager";
+import { cacheFirst, networkFirst, staleWhileRevalidate } from "../../src/modules/caching/strategies";
 import { CacheNetworkError } from "../../src/core/errors";
 import { installMockCacheStorage, uninstallMockCacheStorage } from "./test-utils";
 

@@ -1,22 +1,48 @@
-export const version = "0.1.0";
+/** Public API barrel — hanya export yang sesuai PRD §4. */
+
+// Versi library (disinkronkan manual dengan package.json)
+export const version = "1.0.0-rc.1";
+
+// --- Composables (public API utama) ---
+export { usePWA } from "./composables/usePWA";
+export { useCacheConfig } from "./composables/useCacheConfig";
+export { useNotifications } from "./composables/useNotifications";
+export { useBackgroundSync } from "./composables/useBackgroundSync";
+export { useInstallPrompt } from "./composables/useInstallPrompt";
+
+// --- Public types ---
+export type { UsePWAOptions, UsePWAReturn } from "./types/pwa.types";
+
+export type { CacheRule, CacheStrategy, UseCacheConfigReturn } from "./types/cache.types";
 
 export type {
-  PWAConfig,
-  ServiceWorkerConfig,
-  CacheConfig,
-  StorageConfig,
-  SyncConfig,
-  NotificationConfig,
-} from "./types/config";
+  UseNotificationsOptions,
+  UseNotificationsReturn,
+  PermissionStatus,
+  NotificationPayload,
+} from "./types/notification.types";
 
-export type { BrowserCapabilities } from "./core/capability";
+export type { UseBackgroundSyncOptions, UseBackgroundSyncReturn, SyncEntry } from "./types/sync.types";
 
-export { CoreModule } from "./core/initializer";
-export { validateConfig } from "./core/validator";
-export { checkCapabilities } from "./core/capability";
+export type { UseInstallPromptReturn } from "./types/install.types";
 
-export { PWAError, ConfigValidationError, InitializationError } from "./core/errors";
+// --- Errors ---
+export {
+  PWAError,
+  ConfigValidationError,
+  InitializationError,
+  CapabilityNotSupportedError,
+  CacheError,
+  CacheNotSupportedError,
+  CacheStrategyError,
+  CacheNetworkError,
+  StorageError,
+  StorageNotSupportedError,
+  SyncError,
+  SyncQueueError,
+} from "./core/errors";
 
+// --- Constants ---
 export {
   LIBRARY_VERSION,
   DEFAULT_CACHE_NAME,
@@ -25,45 +51,3 @@ export {
   DEFAULT_MAX_RETRIES,
   DEFAULT_RETRY_DELAY,
 } from "./core/constants";
-
-export { usePWA } from "./modules/usePWA";
-export { useCapability } from "./modules/useCapability";
-export { createPWA } from "./modules/createPWA";
-export type { PWARuntime } from "./modules/createPWA";
-
-export type { StorageAdapter } from "./storage/adapter";
-
-export { IndexedDBStorage } from "./storage/indexeddb";
-export { useStorage } from "./storage/useStorage";
-
-export type { SyncTask, SyncTaskStatus, SyncQueueConfig, SyncTaskExecutor } from "./sync/types";
-
-export { SyncQueue } from "./sync/queue";
-export { useSync } from "./sync/useSync";
-
-// Cache module exports
-export {
-  DefaultCacheManager,
-  cacheFirst,
-  networkFirst,
-  staleWhileRevalidate,
-  resolveStrategy,
-  useCache,
-} from "./cache";
-
-export type {
-  CacheManager,
-  CacheStrategy,
-  CacheMatchOptions,
-  CacheFetchOptions,
-  StrategyContext,
-  StrategyResult,
-  UseCacheReturn,
-} from "./cache";
-
-export { DefaultNotificationManager, useNotification } from "./notification";
-
-export type { NotificationManager, ShowNotificationOptions, UseNotificationReturn } from "./notification";
-
-export { DefaultServiceWorkerManager, useServiceWorker } from "./service-worker";
-export type { ServiceWorkerManager } from "./service-worker";

@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
-import { DefaultCacheManager } from "../../src/cache/manager";
+import { DefaultCacheManager } from "../../src/modules/caching/manager";
 import { CacheNotSupportedError } from "../../src/core/errors";
 import { installMockCacheStorage, uninstallMockCacheStorage } from "./test-utils";
 

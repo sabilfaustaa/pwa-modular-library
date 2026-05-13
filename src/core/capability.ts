@@ -1,19 +1,6 @@
-export interface BrowserCapabilities {
-  serviceWorker: boolean
-  indexedDB: boolean
-  notifications: boolean
-  cacheAPI: boolean
-}
-
-export function checkCapabilities(): BrowserCapabilities {
-  const hasWindow = typeof window !== 'undefined'
-  const hasNavigator = typeof navigator !== 'undefined'
-  const hasGlobalThis = typeof globalThis !== 'undefined'
-
-  return {
-    serviceWorker: hasNavigator && 'serviceWorker' in navigator,
-    indexedDB: hasWindow && 'indexedDB' in window,
-    notifications: hasWindow && 'Notification' in window,
-    cacheAPI: hasGlobalThis && 'caches' in globalThis
-  }
-}
+/**
+ * Re-export dari utils/browser-support.ts — single source of truth
+ * untuk semua feature detection.
+ */
+export { checkCapabilities } from "../utils/browser-support";
+export type { BrowserCapabilities } from "../utils/browser-support";

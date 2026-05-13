@@ -1,7 +1,10 @@
 node_modules
 dist
+coverage
+*.tsbuildinfo
 
+# Editor & AI agent artifacts
+.claude/
+.kiro/
 CLAUDE.md
 AGENTS.md
-.claude/*
-.kiro/*
