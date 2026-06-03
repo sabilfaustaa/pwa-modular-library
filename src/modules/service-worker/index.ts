@@ -3,3 +3,5 @@ export { registerServiceWorker, unregisterServiceWorker, updateServiceWorker, ge
 export type { RegistrationOptions } from "./registry";
 export { SW_MESSAGE_TYPES } from "./messages";
 export type { SWMessageType, SWMessage } from "./messages";
+export { generateSW } from "./sw-template";
+export type { GenerateSWOptions } from "./sw-template";

@@ -28,6 +28,6 @@ export interface UseCacheConfigReturn {
   clearAll: () => Promise<void>;
   /** Bersihkan cache spesifik */
   clear: (cacheName: string) => Promise<boolean>;
-  /** Ukuran cache total dalam bytes */
-  size: () => Promise<number>;
+  /** Jumlah entry yang tersimpan di cache (bukan byte — Cache API tak menyediakan ukuran byte). */
+  count: () => Promise<number>;
 }

@@ -3,7 +3,7 @@
 Panduan ini menjelaskan langkah demi langkah cara mem-publish package `pwa-modular-library` ke registry npm. Konfigurasi publish saat ini:
 
 - `name`: `pwa-modular-library`
-- `version`: `1.0.0-rc.1` (release candidate)
+- `version`: `1.0.0` (rilis stabil)
 - `type`: `module` (ESM) dengan dual build (`.mjs` + `.cjs`) dan types (`.d.ts`)
 - `files`: `["dist", "CHANGELOG.md", "LICENSE"]`
 - `prepack`: otomatis menjalankan `pnpm build` sebelum publish

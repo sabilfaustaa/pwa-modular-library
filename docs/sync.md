@@ -1,6 +1,8 @@
-# Background Sync — `useBackgroundSync()`
+# Antrean Request Luring (Offline Request Queue) — `useBackgroundSync()`
 
-Composable `useBackgroundSync()` menyediakan antrean permintaan HTTP yang otomatis dikirim (flush) saat koneksi kembali online. Mendukung exponential backoff, idempotency key, serta persistensi melalui IndexedDB.
+Composable `useBackgroundSync()` menyediakan antrean permintaan HTTP yang otomatis dikirim (flush) saat koneksi kembali online. Mendukung backoff exponential/linear yang benar-benar diterapkan, idempotency key, serta persistensi melalui IndexedDB.
+
+> **Catatan teknis:** ini **bukan** Background Sync API (`SyncManager`) bawaan browser, melainkan antrean portabel berbasis IndexedDB + event `online`. Pendekatan ini dipilih agar berlaku **lintas browser** (SyncManager hanya tersedia di Chromium), sesuai konteks "sistem dengan keterbatasan konektivitas" lintas perangkat.
 
 ---
 
@@ -26,7 +28,7 @@ const {
 | `queueName` | `string` | **wajib** | Nama antrean (digunakan sebagai nama store di IndexedDB) |
 | `options.maxRetries` | `number` | `3` | Jumlah maksimum percobaan ulang sebelum entri dianggap gagal permanen |
 | `options.backoff` | `"linear" \| "exponential"` | `"exponential"` | Strategi jeda antar percobaan ulang |
-| `options.backoffBase` | `number` | `1000` | Jeda dasar (ms) untuk kalkulasi backoff |
+| `options.baseDelayMs` | `number` | `1000` | Jeda dasar (ms) untuk kalkulasi backoff. Set `0` untuk menonaktifkan jeda. |
 | `options.onSyncSuccess` | `(entry: SyncEntry) => void` | — | Callback saat entri berhasil disinkronisasi |
 | `options.onSyncFailure` | `(entry: SyncEntry, error: Error) => void` | — | Callback saat entri gagal (setelah melampaui maxRetries) |
 
@@ -37,7 +39,7 @@ const {
 | `queue` | `Readonly<Ref<SyncEntry[]>>` | Seluruh entri dalam antrean (reaktif) |
 | `pendingCount` | `Readonly<Ref<number>>` | Jumlah entri yang masih pending |
 | `enqueue(entry)` | `(entry) => Promise<string>` | Menambah entri ke antrean; mengembalikan ID |
-| `flush()` | `() => Promise<void>` | Memproses seluruh entri pending |
+| `flush()` | `() => Promise<void>` | Memproses entri pending yang sudah jatuh tempo (melewati entri yang masih dalam jeda backoff) |
 | `remove(id)` | `(id: string) => Promise<boolean>` | Menghapus entri tertentu |
 | `clear()` | `() => Promise<void>` | Menghapus seluruh entri dalam antrean |
 
@@ -132,7 +134,7 @@ await enqueue({
 1. **Enqueue**: Entri ditulis ke IndexedDB dengan status `pending`.
 2. **Flush otomatis**: Saat browser online (`navigator.onLine === true`), seluruh entri pending dikirim secara otomatis.
 3. **Retry**: Jika permintaan gagal (galat jaringan / respons non-2xx), entri dicoba ulang setelah jeda sesuai strategi backoff.
-4. **Exponential backoff**: `delay = backoffBase × 2^retryCount` (default). Linear: `delay = backoffBase × retryCount`.
+4. **Backoff** (benar-benar diterapkan): saat gagal, entri dijadwalkan ulang dengan `nextAttemptAt = now + delay`, dan `flush()` melewati entri hingga jatuh tempo. Exponential (default): `delay = baseDelayMs × 2^retryCount`. Linear: `delay = baseDelayMs × (retryCount + 1)`. Composable menjadwalkan auto-flush saat entri jatuh tempo (ketika online).
 5. **Max retries**: Setelah `retryCount >= maxRetries`, status entri menjadi `failed` dan `onSyncFailure` dipanggil.
 6. **Idempotency**: Header `Idempotency-Key` disertakan pada setiap permintaan untuk deduplikasi di sisi server.
 7. **FIFO**: Entri diproses sesuai urutan `createdAt` (First In, First Out).
@@ -151,5 +153,5 @@ Background Sync API didukung pada Chrome 49+, Edge 79+, Samsung Internet 4.0+.
 
 - Setiap antrean terisolasi berdasarkan `queueName` — beberapa antrean dapat digunakan dalam satu aplikasi.
 - Antrean disimpan di IndexedDB (database `sabil-pwa-library`, store `sync-queues`) dan bertahan setelah pemuatan ulang halaman.
-- `flush()` hanya memproses entri dengan status `pending`. Entri `failed` tidak ikut dikirim.
+- `flush()` hanya memproses entri `pending` yang sudah jatuh tempo (`nextAttemptAt <= now`). Entri `failed` dan entri yang masih dalam jeda backoff tidak ikut dikirim.
 - Idempotency key dibangkitkan otomatis (UUID v4) jika tidak diisi manual. Server harus menangani header `Idempotency-Key` untuk deduplikasi.

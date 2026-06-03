@@ -27,7 +27,7 @@ const { rules, addRule, removeRule, clearAll, clear, size } = useCacheConfig(ini
 | `removeRule(pattern)` | `(pattern: string \| RegExp) => boolean` | Menghapus aturan; mengembalikan `false` jika tidak ditemukan |
 | `clearAll()` | `() => Promise<void>` | Membersihkan **seluruh** entri cache + menghapus semua aturan |
 | `clear(cacheName)` | `(cacheName: string) => Promise<boolean>` | Membersihkan cache tertentu; mengembalikan `false` jika gagal |
-| `size()` | `() => Promise<number>` | Jumlah total entri di seluruh cache |
+| `count()` | `() => Promise<number>` | Jumlah entri yang tersimpan di cache (bukan byte) |
 
 ### `CacheRule`
 
@@ -93,11 +93,11 @@ await clear("my-cache");    // Hapus semua entri di cache 'my-cache'
 await clearAll();            // Hapus semua cache + semua aturan
 ```
 
-### Memeriksa Ukuran
+### Memeriksa Jumlah Entri
 
 ```ts
-const count = await size();
-console.log(`Total entri di cache: ${count}`);
+const total = await count();
+console.log(`Total entri di cache: ${total}`);
 ```
 
 ---

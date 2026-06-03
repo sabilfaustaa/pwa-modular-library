@@ -1,5 +1,9 @@
 /**
- * useBackgroundSync — Queue HTTP request saat offline, auto-retry saat online.
+ * useBackgroundSync — Antrean request HTTP luring (offline request queue)
+ * dengan auto-retry + backoff saat koneksi pulih.
+ *
+ * Bukan Background Sync API (SyncManager) bawaan browser, melainkan antrean
+ * portabel berbasis IndexedDB + event `online` agar berlaku lintas browser.
  *
  * @module composables/useBackgroundSync
  */
@@ -37,6 +41,7 @@ export function useBackgroundSync(queueName: string, options?: UseBackgroundSync
   const queueSyncOptions: SyncQueueOptions = {
     maxRetries: options?.maxRetries,
     backoff: options?.backoff,
+    baseDelayMs: options?.baseDelayMs,
     onSyncSuccess: options?.onSyncSuccess,
     onSyncFailure: options?.onSyncFailure,
   };
@@ -47,12 +52,15 @@ export function useBackgroundSync(queueName: string, options?: UseBackgroundSync
   const entries = ref<SyncEntry[]>([]);
   const pendingCount = ref(0);
 
+  // Timer untuk auto-flush entry yang menunggu jeda backoff.
+  let backoffTimer: ReturnType<typeof setTimeout> | null = null;
+
   // Auto-flush saat online
   queue.attachOnlineListener();
 
   // Jika saat ini online, auto-flush
   if (typeof navigator !== "undefined" && navigator.onLine) {
-    void queue.flush().then(refreshState);
+    void queue.flush().then(refreshState).then(scheduleNextFlush);
   }
 
   // Refresh state dari IDB
@@ -61,7 +69,33 @@ export function useBackgroundSync(queueName: string, options?: UseBackgroundSync
   // Cleanup
   onUnmounted(() => {
     queue.detachOnlineListener();
+    clearBackoffTimer();
   });
+
+  function clearBackoffTimer(): void {
+    if (backoffTimer !== null) {
+      clearTimeout(backoffTimer);
+      backoffTimer = null;
+    }
+  }
+
+  /**
+   * Jadwalkan flush berikutnya pada saat entry backoff jatuh tempo.
+   * Hanya saat online — jika offline, flush dipicu oleh event `online`.
+   */
+  async function scheduleNextFlush(): Promise<void> {
+    clearBackoffTimer();
+    if (typeof navigator !== "undefined" && !navigator.onLine) return;
+
+    const dueAt = await queue.nextDueAt();
+    if (dueAt === null) return;
+
+    const delay = Math.max(0, dueAt - Date.now());
+    backoffTimer = setTimeout(() => {
+      backoffTimer = null;
+      void queue.flush().then(refreshState).then(scheduleNextFlush);
+    }, delay);
+  }
 
   async function refreshState(): Promise<void> {
     entries.value = await queue.getAll();
@@ -74,7 +108,7 @@ export function useBackgroundSync(queueName: string, options?: UseBackgroundSync
 
     // Jika online, segera flush
     if (typeof navigator !== "undefined" && navigator.onLine) {
-      void queue.flush().then(refreshState);
+      await queue.flush().then(refreshState).then(scheduleNextFlush);
     }
 
     return id;
@@ -83,6 +117,7 @@ export function useBackgroundSync(queueName: string, options?: UseBackgroundSync
   async function flush(): Promise<void> {
     await queue.flush();
     await refreshState();
+    await scheduleNextFlush();
   }
 
   async function remove(id: string): Promise<boolean> {

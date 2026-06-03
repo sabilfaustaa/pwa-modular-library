@@ -1,7 +1,9 @@
 /** Public API barrel — hanya export yang sesuai PRD §4. */
 
-// Versi library (disinkronkan manual dengan package.json)
-export const version = "1.0.0-rc.1";
+import { LIBRARY_VERSION } from "./core/constants";
+
+// Versi library — diturunkan dari satu sumber (core/constants.ts).
+export const version = LIBRARY_VERSION;
 
 // --- Composables (public API utama) ---
 export { usePWA } from "./composables/usePWA";
@@ -9,6 +11,17 @@ export { useCacheConfig } from "./composables/useCacheConfig";
 export { useNotifications } from "./composables/useNotifications";
 export { useBackgroundSync } from "./composables/useBackgroundSync";
 export { useInstallPrompt } from "./composables/useInstallPrompt";
+
+// --- Modul utilitas (non-composable) ---
+// Modul Manifest: validasi & diagnostik kelengkapan web app manifest
+// (progressive enhancement — instalasi homescreen ditangani useInstallPrompt).
+export { validateManifest } from "./modules/manifest";
+export type { ManifestWarning } from "./modules/manifest";
+
+// Modul Service Worker: generator kode SW dari cache rules (static embed /
+// dynamic postMessage). Dipakai sebagai langkah build untuk menghasilkan sw.js.
+export { generateSW } from "./modules/service-worker";
+export type { GenerateSWOptions } from "./modules/service-worker";
 
 // --- Public types ---
 export type { UsePWAOptions, UsePWAReturn } from "./types/pwa.types";

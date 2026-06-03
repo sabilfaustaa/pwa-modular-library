@@ -3,6 +3,6 @@ import { version } from "../src";
 
 describe("version export", () => {
   it("should export current version", () => {
-    expect(version).toBe("1.0.0-rc.1");
+    expect(version).toBe("1.0.0");
   });
 });

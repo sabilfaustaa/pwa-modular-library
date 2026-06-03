@@ -1,10 +1,11 @@
 /**
  * Integration test untuk useBackgroundSync composable.
  *
- * CATATAN: SyncQueue tidak auto-retry dalam loop. Setiap flush() memproses
- * snapshot pending records sekali. Setelah gagal, record kembali ke "pending"
- * dengan retryCount bertambah. Panggil flush() lagi untuk retry.
- * Backoff delay dihitung via computeDelay() tapi tidak di-wait di dalam flush().
+ * CATATAN: setiap flush() memproses snapshot pending records yang sudah
+ * jatuh tempo (nextAttemptAt <= now). Setelah gagal, record kembali ke
+ * "pending" dengan retryCount bertambah dan nextAttemptAt = now + computeDelay().
+ * flush() melewati entry yang masih dalam masa backoff; composable menjadwalkan
+ * auto-flush saat jatuh tempo. Untuk menonaktifkan jeda dalam test, set baseDelayMs: 0.
  */
 
 import { describe, expect, it, beforeEach, afterEach, vi, afterAll } from "vitest";
@@ -213,6 +214,7 @@ describe("useBackgroundSync", () => {
     const { enqueue, flush } = useBackgroundSync("test-retry-manual", {
       maxRetries: 5,
       backoff: "exponential",
+      baseDelayMs: 0, // tanpa jeda — uji ini fokus pada urutan retry
     });
 
     await enqueue({ url: "/api/test", method: "POST", body: {} });
@@ -242,6 +244,7 @@ describe("useBackgroundSync", () => {
     const { enqueue, flush } = useBackgroundSync("test-max-retries", {
       maxRetries: 2,
       backoff: "exponential",
+      baseDelayMs: 0,
       onSyncFailure,
     });
 
@@ -287,7 +290,7 @@ describe("useBackgroundSync", () => {
     expect(entry.method).toBe("POST");
   });
 
-  it("should apply linear backoff correctly", async () => {
+  it("should apply linear backoff correctly (urutan retry, tanpa jeda)", async () => {
     mockFetch
       .mockRejectedValueOnce(new Error("fail"))
       .mockRejectedValueOnce(new Error("fail"))
@@ -297,6 +300,7 @@ describe("useBackgroundSync", () => {
     const { enqueue, flush } = useBackgroundSync("test-linear", {
       maxRetries: 5,
       backoff: "linear",
+      baseDelayMs: 0,
     });
 
     await enqueue({ url: "/api/test", method: "POST", body: {} });
@@ -316,6 +320,37 @@ describe("useBackgroundSync", () => {
     await flush();
     await tick(10);
     expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+
+  it("backoff benar-benar menunda retry: flush sebelum jatuh tempo dilewati", async () => {
+    // Selalu gagal pada percobaan pertama agar entry masuk masa backoff.
+    mockFetch.mockRejectedValue(new Error("network down"));
+
+    setOffline();
+    const { enqueue, flush } = useBackgroundSync("test-backoff-delay", {
+      maxRetries: 5,
+      backoff: "exponential",
+      baseDelayMs: 120, // delay retry pertama = 120ms × 2^0 = 120ms
+    });
+
+    await enqueue({ url: "/api/test", method: "POST", body: {} });
+    setOnline();
+
+    // Attempt 1 — gagal, entry dijadwalkan ulang ~120ms ke depan.
+    await flush();
+    await tick(10);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    // Flush lagi SEBELUM jatuh tempo → entry dilewati, tidak ada fetch baru.
+    await flush();
+    await tick(10);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    // Tunggu melewati jeda backoff → flush memproses ulang.
+    await tick(150);
+    await flush();
+    await tick(10);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 
   // =========================================================

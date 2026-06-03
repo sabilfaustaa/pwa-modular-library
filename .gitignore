@@ -3,6 +3,16 @@ dist
 coverage
 *.tsbuildinfo
 
+# Build & pack artifacts
+*.tgz
+vite.config.ts.timestamp-*.mjs
+
+# VitePress
+.vitepress/cache
+.vitepress/dist
+docs/.vitepress/dist
+docs/.vitepress/cache
+
 # Editor & AI agent artifacts
 .claude/
 .kiro/

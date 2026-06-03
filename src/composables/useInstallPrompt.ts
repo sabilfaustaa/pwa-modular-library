@@ -50,7 +50,7 @@ function checkInstalled(): boolean {
  * @example
  * ```vue
  * <script setup lang="ts">
- * import { useInstallPrompt } from '@sabil/pwa-library'
+ * import { useInstallPrompt } from 'pwa-modular-library'
  *
  * const { isSupported, isInstalled, canPrompt, prompt } = useInstallPrompt()
  *

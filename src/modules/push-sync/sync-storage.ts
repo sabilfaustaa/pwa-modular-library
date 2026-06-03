@@ -25,6 +25,11 @@ export interface SyncQueueRecord {
   createdAt: number;
   retryCount: number;
   lastAttemptAt: number | null;
+  /**
+   * Waktu paling awal (epoch ms) entry boleh dicoba lagi (backoff).
+   * `null` berarti boleh segera diproses. Diisi oleh handleRetry().
+   */
+  nextAttemptAt: number | null;
   status: "pending" | "syncing" | "failed";
 }
 
@@ -64,6 +69,7 @@ export function entryToRecord(
     createdAt: now,
     retryCount: 0,
     lastAttemptAt: null,
+    nextAttemptAt: null,
     status: "pending",
   };
 }

@@ -1,0 +1,146 @@
+/* Gaya bersama untuk komponen demo interaktif. */
+
+.demo-card {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+  background: var(--vp-c-bg-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.demo-card h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.demo-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.badge {
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.78rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--vp-c-divider);
+  white-space: nowrap;
+}
+.badge.on {
+  background: var(--vp-c-green-soft);
+  color: var(--vp-c-green-1);
+}
+.badge.off {
+  background: var(--vp-c-bg-mute);
+  color: var(--vp-c-text-2);
+}
+.badge.warn {
+  background: var(--vp-c-yellow-soft);
+  color: var(--vp-c-yellow-1);
+}
+
+.demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.demo-btn {
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.demo-btn:hover {
+  opacity: 0.9;
+}
+.demo-btn.secondary {
+  background: transparent;
+  color: var(--vp-c-brand-1);
+  border: 1px solid var(--vp-c-brand-1);
+}
+.demo-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.demo-input,
+.demo-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  font-size: 0.88rem;
+}
+.demo-textarea {
+  font-family: var(--vp-font-family-mono);
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.demo-note {
+  font-size: 0.85rem;
+  color: var(--vp-c-text-2);
+  margin: 0;
+}
+.demo-result {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.demo-stat {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--vp-c-brand-1);
+}
+
+.demo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.demo-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.8rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+.demo-list li:last-child {
+  border-bottom: none;
+}
+.demo-empty {
+  font-size: 0.85rem;
+  color: var(--vp-c-text-2);
+  font-style: italic;
+  margin: 0;
+}
+
+.demo-pre {
+  max-height: 18rem;
+  overflow: auto;
+  background: var(--vp-c-bg-alt);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  padding: 0.8rem;
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.78rem;
+  white-space: pre;
+  margin: 0;
+}

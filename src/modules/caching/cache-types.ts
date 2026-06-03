@@ -38,26 +38,3 @@ export interface StrategyContext {
   matchOptions?: CacheMatchOptions;
   manager: CacheManager;
 }
-
-export interface UseCacheReturn {
-  match: (request: RequestInfo | URL, options?: CacheMatchOptions) => Promise<Response | undefined>;
-
-  put: (request: RequestInfo | URL, response: Response, ttl?: number) => Promise<void>;
-
-  remove: (request: RequestInfo | URL) => Promise<boolean>;
-
-  clear: () => Promise<boolean>;
-
-  invalidate: (requests: Array<RequestInfo | URL>) => Promise<void>;
-
-  cacheFirst: (request: RequestInfo | URL, options?: Omit<CacheFetchOptions, "strategy">) => Promise<StrategyResult>;
-
-  networkFirst: (request: RequestInfo | URL, options?: Omit<CacheFetchOptions, "strategy">) => Promise<StrategyResult>;
-
-  staleWhileRevalidate: (
-    request: RequestInfo | URL,
-    options?: Omit<CacheFetchOptions, "strategy">,
-  ) => Promise<StrategyResult>;
-
-  fetchWithStrategy: (request: RequestInfo | URL, options?: CacheFetchOptions) => Promise<StrategyResult>;
-}

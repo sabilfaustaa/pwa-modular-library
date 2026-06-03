@@ -7,6 +7,7 @@
 
 import type { NotificationPayload, PermissionStatus } from "../../types/notification.types";
 import { PWAError } from "../../core/errors";
+import { logger } from "../../utils/logger";
 
 export interface NotificationManagerOptions {
   /** VAPID public key (untuk subscribe push) */
@@ -142,7 +143,7 @@ export class NotificationManager {
       if (error instanceof PWAError) {
         throw error;
       }
-      console.error("[sabil-pwa-library] subscribe gagal:", error);
+      logger.error("subscribe gagal:", error);
       return null;
     }
   }

@@ -1,4 +1,9 @@
-export const LIBRARY_VERSION = "0.1.0";
+/**
+ * Versi library — SUMBER KEBENARAN TUNGGAL untuk versi runtime.
+ * `version` di src/index.ts diturunkan dari konstanta ini.
+ * Jaga tetap sinkron dengan field "version" di package.json saat rilis.
+ */
+export const LIBRARY_VERSION = "1.0.0";
 
 export const DEFAULT_CACHE_NAME = "pwa-cache-v1";
 export const DEFAULT_DB_NAME = "pwa-db";

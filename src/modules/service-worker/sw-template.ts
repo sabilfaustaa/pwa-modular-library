@@ -9,15 +9,29 @@
 
 import type { CacheRule } from "../../types/cache.types";
 
+/** Opsi untuk {@link generateSW}. */
+export interface GenerateSWOptions {
+  /**
+   * Jika `true`, SW meminta rules dari main thread via postMessage
+   * (mode dinamis, berpasangan dengan useCacheConfig).
+   * Jika `false` (default), rules di-embed langsung ke dalam kode SW (mode statis).
+   */
+  kirimRulesViaPostMessage?: boolean;
+}
+
 /**
  * Generate kode service worker yang menerapkan aturan caching.
  *
+ * Dua mode:
+ *   - **static embed** (default): rules ditanam langsung saat build.
+ *   - **dynamic postMessage**: rules dikirim runtime dari main thread
+ *     (`useCacheConfig`) lewat pesan `SABIL_PWA_CACHE_RULES_UPDATE`.
+ *
  * @param rules - Daftar aturan caching
- * @param options.kirimRulesViaPostMessage - Jika true, SW akan minta rules
- *   dari main thread via postMessage (default: false, rules di-embed)
+ * @param options - Lihat {@link GenerateSWOptions}
  * @returns String kode JavaScript service worker
  */
-export function generateSW(rules: readonly CacheRule[], options?: { kirimRulesViaPostMessage?: boolean }): string {
+export function generateSW(rules: readonly CacheRule[], options?: GenerateSWOptions): string {
   if (options?.kirimRulesViaPostMessage) {
     return generateSWWithPostMessage();
   }
@@ -31,7 +45,7 @@ function generateSWWithEmbeddedRules(rules: readonly CacheRule[]): string {
   const rulesJson = JSON.stringify(rules, null, 2);
 
   return `
-// Auto-generated oleh @sabil/pwa-library
+// Auto-generated oleh pwa-modular-library
 // Jangan edit manual — regenerate via useCacheConfig
 
 const CACHE_RULES = ${rulesJson};
@@ -128,7 +142,7 @@ async function applyStrategy(request, rule) {
  */
 function generateSWWithPostMessage(): string {
   return `
-// Auto-generated oleh @sabil/pwa-library
+// Auto-generated oleh pwa-modular-library
 // Rules dikirim dari main thread via postMessage
 
 let CACHE_RULES = [];

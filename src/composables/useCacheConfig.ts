@@ -4,7 +4,7 @@
  * @module composables/useCacheConfig
  */
 
-import { ref, readonly, type Ref } from "vue";
+import { ref, readonly, onUnmounted, type Ref } from "vue";
 import { RuleRegistry } from "../modules/caching/rule-registry";
 import { broadcastRules, listenForRuleRequest } from "../modules/caching/sw-sync";
 import { DefaultCacheManager } from "../modules/caching/manager";
@@ -29,11 +29,12 @@ export function useCacheConfig(initialRules?: CacheRule[]): UseCacheConfigReturn
     broadcastRules(rules.value);
   }
 
+  // Fungsi pelepas listener SW (diisi oleh startListening).
+  let unlisten: (() => void) | null = null;
+
   // Dengarkan permintaan rules dari SW
   function startListening(): void {
-    const unlisten = listenForRuleRequest(() => registry.getAll());
-    // Cleanup akan dipanggil saat komponen unmount (TODO: integrasi Vue lifecycle)
-    void unlisten;
+    unlisten = listenForRuleRequest(() => registry.getAll());
   }
 
   /**
@@ -84,10 +85,11 @@ export function useCacheConfig(initialRules?: CacheRule[]): UseCacheConfigReturn
   }
 
   /**
-   * Hitung total ukuran cache (estimasi berdasarkan jumlah entry).
-   * Cache API tidak menyediakan size langsung; return jumlah entry.
+   * Hitung jumlah entry yang tersimpan di cache.
+   * Cache API tidak menyediakan ukuran byte secara langsung, sehingga
+   * yang dikembalikan adalah jumlah entry (bukan byte).
    */
-  async function size(): Promise<number> {
+  async function count(): Promise<number> {
     const keys = await manager.keys();
     return keys.length;
   }
@@ -95,13 +97,21 @@ export function useCacheConfig(initialRules?: CacheRule[]): UseCacheConfigReturn
   // Mulai listener untuk SW cold-start request
   startListening();
 
+  // Lepas listener SW saat komponen di-unmount (hanya berlaku di dalam setup()).
+  onUnmounted(() => {
+    if (unlisten) {
+      unlisten();
+      unlisten = null;
+    }
+  });
+
   return {
     rules: readonly(rules) as Readonly<Ref<CacheRule[]>>,
     addRule,
     removeRule,
     clearAll,
     clear,
-    size,
+    count,
   };
 }
 

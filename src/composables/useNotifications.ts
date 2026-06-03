@@ -22,7 +22,7 @@ import type {
  * @example
  * ```vue
  * <script setup lang="ts">
- * import { useNotifications } from '@sabil/pwa-library'
+ * import { useNotifications } from 'pwa-modular-library'
  *
  * const { permission, isSubscribed, subscribe, show } = useNotifications({
  *   vapidPublicKey: 'BDd3_h...',

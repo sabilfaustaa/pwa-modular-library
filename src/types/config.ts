@@ -1,4 +1,7 @@
-export type CacheStrategy = "cache-first" | "network-first" | "stale-while-revalidate";
+// CacheStrategy didefinisikan tunggal di cache.types.ts (5 nilai) — di-re-export di sini
+// agar interface konfigurasi memakai definisi kanonik yang sama.
+export type { CacheStrategy } from "./cache.types";
+import type { CacheStrategy } from "./cache.types";
 
 export interface ServiceWorkerConfig {
   enabled?: boolean;

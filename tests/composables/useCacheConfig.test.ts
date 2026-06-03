@@ -125,11 +125,11 @@ describe("useCacheConfig", () => {
     });
   });
 
-  describe("size", () => {
-    it("should return estimated entry count", async () => {
-      const { size } = useCacheConfig();
+  describe("count", () => {
+    it("should return stored entry count", async () => {
+      const { count } = useCacheConfig();
 
-      const result = await size();
+      const result = await count();
 
       expect(typeof result).toBe("number");
       expect(result).toBeGreaterThanOrEqual(0);

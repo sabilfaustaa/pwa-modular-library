@@ -7,6 +7,8 @@ export interface UseBackgroundSyncOptions {
   maxRetries?: number;
   /** Strategi backoff (default: exponential) */
   backoff?: "linear" | "exponential";
+  /** Delay dasar backoff dalam ms (default: 1000). Set 0 untuk menonaktifkan jeda. */
+  baseDelayMs?: number;
   /** Callback saat sync sukses */
   onSyncSuccess?: (entry: SyncEntry) => void;
   /** Callback saat sync gagal final (sudah habis retry) */

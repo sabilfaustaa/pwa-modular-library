@@ -13,8 +13,10 @@ Dirancang dengan pendekatan **Composition API first** — setiap fitur adalah co
 | Lifecycle Service Worker | `usePWA()` | Chrome 45+, Edge 79+, Firefox 44+, Safari 11.1+ |
 | Strategi Caching | `useCacheConfig()` | Chrome 43+, Edge 79+, Firefox 41+, Safari 11.1+ |
 | Push Notification | `useNotifications()` | Chrome 42+, Edge 79+, Firefox 44+, Safari 16+ |
-| Antrean Background Sync | `useBackgroundSync()` | Chrome 49+, Edge 79+, Samsung Internet 4+ |
+| Antrean Request Luring (Offline Queue) | `useBackgroundSync()` | Semua browser ber-IndexedDB (berbasis event `online`, bukan SyncManager) |
 | Install Prompt (A2HS) | `useInstallPrompt()` | Chrome 45+, Edge 79+, Samsung Internet 4+ |
+
+Utilitas non-composable: `generateSW()` (generator kode service worker dari cache rules) dan `validateManifest()` (validasi web app manifest) — keduanya diekspor dari entry publik.
 
 ---
 
@@ -89,13 +91,14 @@ async function enableNotifications() {
 </script>
 ```
 
-### 4. Background Sync
+### 4. Antrean Request Luring (Offline Queue)
 
 ```ts
 import { useBackgroundSync } from 'pwa-modular-library'
 
 const { enqueue, pendingCount, flush } = useBackgroundSync('exam-answers', {
   maxRetries: 3,
+  backoff: 'exponential', // jeda retry: baseDelayMs × 2^retryCount
   onSyncSuccess: (entry) => console.log('Tersimpan:', entry.id),
 })
 
@@ -168,8 +171,10 @@ useCacheConfig      2.41 KB gzip
 useNotifications    1.38 KB gzip
 useBackgroundSync   1.77 KB gzip
 useInstallPrompt    0.52 KB gzip
-Full library        8.46 KB gzip
+Full library       10.60 KB gzip  (termasuk util generateSW & validateManifest)
 ```
+
+> Angka bundle final akan diverifikasi ulang pada tahap evaluasi (Bundle Analyzer). Util `generateSW`/`validateManifest` hanya masuk bundle bila benar-benar diimpor (tree-shakeable).
 
 ---
 
@@ -188,7 +193,7 @@ Lihat [docs/browser-support.md](./docs/browser-support.md) untuk matriks dukunga
 - [Service Worker (`usePWA`)](./docs/service-worker.md)
 - [Caching (`useCacheConfig`)](./docs/cache.md)
 - [Notifikasi (`useNotifications`)](./docs/notification.md)
-- [Background Sync (`useBackgroundSync`)](./docs/sync.md)
+- [Antrean Request Luring (`useBackgroundSync`)](./docs/sync.md)
 - [Install Prompt (`useInstallPrompt`)](./docs/install-prompt.md)
 
 ---
@@ -201,7 +206,13 @@ pnpm typecheck        # Periksa tipe TypeScript
 pnpm build            # Build library (ESM + CJS + .d.ts)
 pnpm test:run         # Jalankan seluruh pengujian (Vitest)
 pnpm test:coverage    # Pengujian + laporan cakupan
+pnpm docs:dev         # Jalankan website dokumentasi (VitePress) lokal
+pnpm docs:build       # Build website dokumentasi statis
 ```
+
+### Website dokumentasi
+
+Dokumentasi komprehensif + contoh interaktif dibangun dengan **VitePress** di folder `docs/`. Jalankan `pnpm docs:dev` lalu buka `http://localhost:5173`. Komponen demo mengimpor library via alias `pwa-modular-library` (→ `src/index.ts`) sehingga berperilaku persis seperti konsumen.
 
 ---
 

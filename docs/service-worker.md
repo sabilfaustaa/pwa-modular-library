@@ -91,9 +91,46 @@ Library akan fail gracefully: jika browser tidak mendukung, `isRegistered` tetap
 
 ---
 
-## 4. Catatan
+## 4. Menghasilkan `sw.js` dengan `generateSW()`
 
-- Berkas Service Worker (`/sw.js`) **harus** disediakan oleh aplikasi pengguna. Library **tidak** membuat berkas SW secara otomatis.
-- Gunakan `generateSW()` untuk menghasilkan kode SW yang sudah menyertakan listener aturan cache.
+Berkas Service Worker (`/sw.js`) **harus** disediakan oleh aplikasi pengguna — library **tidak** memasang berkas SW secara otomatis. Library menyediakan `generateSW()` untuk **menghasilkan** kode SW lengkap (termasuk listener `fetch` + penerapan strategi caching) sebagai **langkah build**.
+
+```ts
+import { generateSW } from "pwa-modular-library";
+import { writeFileSync } from "node:fs";
+
+const rules = [
+  { pattern: "/api/*", strategy: "network-first", cacheName: "api-cache" },
+  { pattern: "/assets/*", strategy: "cache-first", cacheName: "asset-cache" },
+];
+
+writeFileSync("public/sw.js", generateSW(rules));
+```
+
+### Dua mode
+
+| Mode | Pemanggilan | Kapan dipakai |
+|---|---|---|
+| **Static embed** (default) | `generateSW(rules)` | Rules diketahui saat build; ditanam langsung ke `sw.js`. Paling sederhana. |
+| **Dynamic postMessage** | `generateSW([], { kirimRulesViaPostMessage: true })` | Rules dikirim runtime dari main thread oleh `useCacheConfig` lewat pesan `SABIL_PWA_CACHE_RULES_UPDATE`. Untuk rules yang berubah dinamis tanpa regenerasi `sw.js`. |
+
+> **Penting:** rules **tidak** otomatis aktif begitu ditambahkan lewat `useCacheConfig`. Pada mode static embed, regenerasi `sw.js` adalah langkah build; pada mode dynamic, `useCacheConfig` mem-broadcast rules ke SW yang sudah memuat handler postMessage.
+
+### Skrip build bawaan
+
+Repo menyediakan skrip rujukan:
+
+```bash
+# static embed dari file rules JSON
+node scripts/generate-sw.mjs --rules ./cache-rules.json --out ./public/sw.js
+
+# dynamic postMessage
+node scripts/generate-sw.mjs --out ./public/sw.js --post-message
+```
+
+---
+
+## 5. Catatan
+
 - Pembersihan listener online/offline dilakukan secara otomatis melalui `onUnmounted` (hanya jika dipanggil di dalam `setup()` komponen Vue).
 - Jika dipanggil di luar konteks Vue (misalnya pada `main.ts`), listener akan tetap terpasang; pengguna bertanggung jawab untuk melepasnya.

@@ -11,7 +11,7 @@ export type {
 export type { UseBackgroundSyncOptions, UseBackgroundSyncReturn, SyncEntry } from "./sync.types";
 export type { UseInstallPromptReturn } from "./install.types";
 
-/** Internal config types (digunakan juga oleh CoreModule) */
+/** Internal config types (opsi konfigurasi opsional untuk modul). */
 export type {
   PWAConfig,
   ServiceWorkerConfig,
