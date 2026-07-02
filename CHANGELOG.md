@@ -7,6 +7,35 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ---
 
+## [1.1.0] — 2026-06-22
+
+Iterasi artefak (DSR) hasil umpan balik demonstrasi pada studi kasus CBT (`cbt-pwa-library`). `generateSW()` sebelumnya (≤1.0.1) menghasilkan SW yang terlalu minimal untuk aplikasi nyata dengan request non-GET, app-shell, dan flow pembaruan terkonfirmasi user. Versi ini menutup kesenjangan tersebut tanpa mengubah default yang aman bagi konsumen lama (kecuali perbaikan bug non-GET).
+
+### Added
+- `generateSW()` kini menerima opsi tambahan pada `GenerateSWOptions`:
+  - `precache: string[]` — precache app-shell saat `install` (reload offline menyajikan kerangka aplikasi tanpa menunggu cache-on-fetch).
+  - `navigationFallback: string` — fallback app-shell untuk request navigasi (`mode === 'navigate'`) saat offline (SPA offline-capable).
+  - `cacheVersion: string` — versi cache yang disisipkan ke seluruh nama cache; cache versi lama dibersihkan otomatis saat `activate`.
+  - `skipWaiting: boolean` (default `false`) — saat `false`, SW menunggu pesan `{ type: 'SKIP_WAITING' }` sehingga pembaruan dapat dikonfirmasi user (banner "Perbarui").
+- SW hasil `generateSW()` kini memproses pesan `{ type: 'SKIP_WAITING' }` dari main thread.
+- `usePWA().update()` kini mengaktifkan waiting worker (kirim `SKIP_WAITING` + reload saat `controllerchange`) bila tersedia, sehingga setara tombol "Perbarui" pada SW manual. Bila tidak ada waiting worker, perilaku lama (pengecekan update) dipertahankan.
+
+### Fixed
+- `generateSW()` kini melewati request non-GET secara default (`skipNonGet: true`). Sebelumnya request seperti `PUT`/`POST` yang cocok sebuah rule memicu `TypeError` karena Cache API menolak `cache.put()` pada request non-GET.
+- Strategi `cache-first`/`network-first`/`cache-only` kini juga mencari di seluruh cache (`caches.match`) sebagai fallback, sehingga aset yang di-precache tetap tersaji walau bukan di cache rule.
+
+### Notes
+- Perubahan default `skipNonGet` (true) dan `skipWaiting` (false) bersifat perbaikan perilaku. Konsumen yang menginginkan perilaku lama dapat menyetel `skipNonGet: false` / `skipWaiting: true`.
+
+---
+
+## [1.0.1] — 2026-06-16
+
+### Fixed
+- `checkCapabilities()` dan tipe `BrowserCapabilities` kini benar-benar diekspor dari entry point publik (`pwa-modular-library`). Sebelumnya fungsi ada dan teruji namun tidak ter-export dari barrel, sehingga `import { checkCapabilities } from "pwa-modular-library"` gagal bagi konsumen npm meskipun sudah didokumentasikan.
+
+---
+
 ## [1.0.0-rc.1] — 2026-05-12
 
 Rilis kandidat pertama. API publik final sesuai PRD. Library siap diukur untuk studi komparatif Putaran 1.

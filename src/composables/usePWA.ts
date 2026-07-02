@@ -51,6 +51,10 @@ export function usePWA(options?: UsePWAOptions): UsePWAReturn {
     onUnmounted(cleanup);
   }
 
+  // Registrasi aktif — disimpan agar update() dapat mengaktifkan waiting worker
+  // (flow pembaruan terkonfirmasi user, mis. banner "Perbarui").
+  let activeRegistration: ServiceWorkerRegistration | null = null;
+
   // Register service worker
   if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
     registerServiceWorker({
@@ -58,11 +62,13 @@ export function usePWA(options?: UsePWAOptions): UsePWAReturn {
       scope,
       onRegistered: (registration) => {
         isRegistered.value = true;
+        activeRegistration = registration;
         logger.info("Service Worker registered via usePWA", registration.scope);
         options?.onRegistered?.(registration);
       },
       onUpdateAvailable: (registration) => {
         hasUpdate.value = true;
+        activeRegistration = registration;
         logger.info("Service Worker update detected via usePWA");
         options?.onUpdateAvailable?.();
 
@@ -80,6 +86,24 @@ export function usePWA(options?: UsePWAOptions): UsePWAReturn {
   }
 
   async function update(): Promise<void> {
+    // Flow pembaruan terkonfirmasi user: jika ada SW baru yang "waiting",
+    // kirim SKIP_WAITING lalu reload saat controller berganti. Ini menjadikan
+    // usePVA().update() setara dengan tombol "Perbarui" pada SW manual.
+    const waiting = activeRegistration?.waiting;
+    if (waiting && typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener(
+        "controllerchange",
+        () => {
+          if (typeof window !== "undefined") window.location.reload();
+        },
+        { once: true },
+      );
+      waiting.postMessage({ type: "SKIP_WAITING" });
+      logger.info("SKIP_WAITING dikirim ke waiting SW via usePWA");
+      return;
+    }
+
+    // Tidak ada waiting worker → lakukan pengecekan update biasa.
     try {
       await updateServiceWorker();
       logger.info("Service Worker update triggered via usePWA");

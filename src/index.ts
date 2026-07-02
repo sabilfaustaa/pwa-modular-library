@@ -23,6 +23,10 @@ export type { ManifestWarning } from "./modules/manifest";
 export { generateSW } from "./modules/service-worker";
 export type { GenerateSWOptions } from "./modules/service-worker";
 
+// Feature detection: deteksi kapabilitas browser (KF-20) dalam satu panggilan.
+export { checkCapabilities } from "./core/capability";
+export type { BrowserCapabilities } from "./core/capability";
+
 // --- Public types ---
 export type { UsePWAOptions, UsePWAReturn } from "./types/pwa.types";
 
