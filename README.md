@@ -166,15 +166,15 @@ async function handleInstall() {
 Setiap composable bisa diimpor independen. Import `usePWA` **tidak** akan mem-bundle `useNotifications`:
 
 ```
-usePWA              1.34 KB gzip
-useCacheConfig      2.41 KB gzip
-useNotifications    1.38 KB gzip
-useBackgroundSync   1.77 KB gzip
+usePWA              1.41 KB gzip
+useCacheConfig      2.44 KB gzip
+useNotifications    1.68 KB gzip
+useBackgroundSync   2.07 KB gzip
 useInstallPrompt    0.52 KB gzip
-Full library       10.60 KB gzip  (termasuk util generateSW & validateManifest)
+Full library       11.22 KB gzip  (termasuk util generateSW & validateManifest)
 ```
 
-> Angka bundle final akan diverifikasi ulang pada tahap evaluasi (Bundle Analyzer). Util `generateSW`/`validateManifest` hanya masuk bundle bila benar-benar diimpor (tree-shakeable).
+> Angka di atas terukur pada **v1.1.0** via `node scripts/check-bundle-size.mjs` (2026-07-02). Rincian & metodologi: [`bench/REKAP_BUNDLE.md`](bench/REKAP_BUNDLE.md). Util `generateSW`/`validateManifest` hanya masuk bundle bila benar-benar diimpor (tree-shakeable).
 
 ---
 

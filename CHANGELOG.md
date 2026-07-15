@@ -7,6 +7,18 @@ dan proyek ini mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ---
 
+## Keputusan terbuka — Nama resmi paket (belum final)
+
+> **Status: BUTUH INPUT PENULIS.** `package.json` saat ini bernama **`pwa-modular-library`** (v1.1.0),
+> namun naskah skripsi masih memakai nama campur ("pwa modular library", "sabil pwa library",
+> prefix "SABIL PWA"; internal SW memakai pesan berprefix `SABIL_PWA_*` dan cache berprefix `pwa-`).
+> Nama resmi belum diputuskan penulis — lihat `../docs/PERLU_INPUT_PENULIS.md` (Prioritas 4, butir
+> "Nama resmi library"). **Nama paket TIDAK diubah otomatis** sampai penulis memutuskan; setelah
+> final, samakan `package.json`, README, docs, dependency `file:` di `cbt-pwa-library` &
+> `tixlane-ground-handle-library`, dan seluruh naskah dalam satu perubahan ber-CHANGELOG.
+
+---
+
 ## [1.1.0] — 2026-06-22
 
 Iterasi artefak (DSR) hasil umpan balik demonstrasi pada studi kasus CBT (`cbt-pwa-library`). `generateSW()` sebelumnya (≤1.0.1) menghasilkan SW yang terlalu minimal untuk aplikasi nyata dengan request non-GET, app-shell, dan flow pembaruan terkonfirmasi user. Versi ini menutup kesenjangan tersebut tanpa mengubah default yang aman bagi konsumen lama (kecuali perbaikan bug non-GET).

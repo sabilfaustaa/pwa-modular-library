@@ -265,6 +265,7 @@ describe("useBackgroundSync", () => {
     const record = await storage.get(id);
     expect(record).toBeDefined();
     expect(record!.status).toBe("failed");
+    expect(record!.retryCount).toBe(2);
 
     expect(onSyncFailure).toHaveBeenCalledTimes(1);
   });

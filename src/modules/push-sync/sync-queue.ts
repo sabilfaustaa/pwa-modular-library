@@ -223,7 +223,7 @@ export class SyncQueue {
     const nextRetryCount = record.retryCount + 1;
 
     if (nextRetryCount >= this.maxRetries) {
-      await this.markFailed(record, error);
+      await this.markFailed({ ...record, retryCount: nextRetryCount }, error);
       return;
     }
 

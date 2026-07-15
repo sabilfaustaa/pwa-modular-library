@@ -6,20 +6,27 @@
 
 | Item | Nilai |
 |------|-------|
-| Tanggal eksekusi | 2026-06-14 |
-| Commit hash | `9ba8e30` |
+| Tanggal eksekusi | 2026-07-02 |
+| Versi library | 1.1.0 |
+| Commit hash | `f4f5eb3` (tag `v1.1.0`) |
 | Branch | `main` |
 | Runner | Vitest 1.6.1 |
 | Environment | happy-dom + fake-indexeddb + MSW |
-| Perintah | `npm run test:run`, `npm run test:coverage` |
+| Perintah reproduksi | `pnpm test:run` (durasi run ini: 23,74 s) |
+| Coverage | `pnpm test:coverage` |
+
+> **Perubahan dari run 2026-06-14 (commit `9ba8e30`, 164 tes):** delta **+7 tes** seluruhnya di
+> `sw-template.test.ts` (4 → 11) untuk opsi baru `generateSW()` v1.1.0
+> (`precache`, `skipNonGet`, `navigationFallback`, `cacheVersion`, `skipWaiting`). Berkas lain tidak berubah.
+> Angka lama (164 tes / 18 berkas) di naskah/draf **usang** — pakai 171.
 
 ## Ringkasan Total
 
 | Metrik | Jumlah |
 |--------|--------|
 | Test file | 18 |
-| Total test case | **164** |
-| Pass | **164** |
+| Total test case | **171** |
+| Pass | **171** |
 | Fail | **0** |
 | Skip | **0** |
 
@@ -58,10 +65,10 @@
 | File | # test | pass | fail |
 |------|:------:|:----:|:----:|
 | manifest-validator.test.ts | 20 | 20 | 0 |
+| sw-template.test.ts | 11 | 11 | 0 |
 | registry.test.ts | 8 | 8 | 0 |
 | retry-policy.test.ts | 5 | 5 | 0 |
-| sw-template.test.ts | 4 | 4 | 0 |
-| **Subtotal** | **37** | **37** | **0** |
+| **Subtotal** | **44** | **44** | **0** |
 
 ### tests/core
 
@@ -93,14 +100,14 @@
 
 ## Ringkasan Coverage
 
-Coverage keseluruhan (seluruh `src/`):
+Coverage keseluruhan (seluruh `src/`) — run `pnpm test:coverage` 2026-07-02 (commit `f4f5eb3`):
 
 | Metrik | % |
 |--------|:---:|
-| Statements | 87.25 |
-| Branches | 85.06 |
-| Functions | 85.71 |
-| Lines | 87.25 |
+| Statements | 87.98 |
+| Branches | 86.26 |
+| Functions | 86.79 |
+| Lines | 87.98 |
 
 ### Coverage modul backoff (push-sync)
 
