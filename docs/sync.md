@@ -49,7 +49,7 @@ const {
 interface SyncEntry {
   id: string;               // UUID (dibangkitkan otomatis)
   url: string;              // URL permintaan
-  method: string;           // HTTP method (GET, POST, PUT, DELETE)
+  method: "POST" | "PUT" | "PATCH" | "DELETE"; // Method mutasi — GET tidak diantrekan
   body?: unknown;           // Body permintaan (diserialisasi ke JSON)
   headers?: Record<string, string>;  // Header kustom
   idempotencyKey?: string;  // Key untuk deduplikasi (dibangkitkan otomatis)
@@ -133,7 +133,7 @@ await enqueue({
 
 1. **Enqueue**: Entri ditulis ke IndexedDB dengan status `pending`.
 2. **Flush otomatis**: Saat browser online (`navigator.onLine === true`), seluruh entri pending dikirim secara otomatis.
-3. **Retry**: Jika permintaan gagal (galat jaringan / respons non-2xx), entri dicoba ulang setelah jeda sesuai strategi backoff.
+3. **Retry**: Galat jaringan dan respons **5xx** dicoba ulang setelah jeda backoff. Respons **4xx** (client error) **tidak** di-retry — entri langsung berstatus `failed` dan `onSyncFailure` dipanggil, karena mengulang request yang salah tidak akan memperbaikinya.
 4. **Backoff** (benar-benar diterapkan): saat gagal, entri dijadwalkan ulang dengan `nextAttemptAt = now + delay`, dan `flush()` melewati entri hingga jatuh tempo. Exponential (default): `delay = baseDelayMs × 2^retryCount`. Linear: `delay = baseDelayMs × (retryCount + 1)`. Composable menjadwalkan auto-flush saat entri jatuh tempo (ketika online).
 5. **Max retries**: Setelah `retryCount >= maxRetries`, status entri menjadi `failed` dan `onSyncFailure` dipanggil.
 6. **Idempotency**: Header `Idempotency-Key` disertakan pada setiap permintaan untuk deduplikasi di sisi server.
@@ -143,9 +143,9 @@ await enqueue({
 
 ## 4. Dukungan Browser
 
-Background Sync API didukung pada Chrome 49+, Edge 79+, Samsung Internet 4.0+.
+Composable ini **tidak memakai Background Sync API native** (`SyncManager`) — di browser mana pun. Mekanismenya murni IndexedDB + event `online`/`offline`, yang didukung semua browser modern (lihat [matriks dukungan](/browser-support)). Konsekuensinya sama di semua browser: flush hanya terjadi selama tab masih hidup; tidak ada sinkronisasi di latar belakang setelah tab ditutup.
 
-**Firefox dan Safari tidak mendukung Background Sync API.** Library tetap berfungsi: entri disimpan di IDB dan dikirim saat browser kembali online, namun tanpa Background Sync API native (hanya mengandalkan event `navigator.onLine`).
+Sebagai pembanding, Background Sync API native hanya tersedia di Chromium (Chrome 49+, Edge 79+, Samsung Internet 4.0+) — keterbatasan lintas-browser inilah alasan library memilih pendekatan portabel di atas.
 
 ---
 

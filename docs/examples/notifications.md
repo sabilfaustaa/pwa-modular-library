@@ -8,6 +8,12 @@ Demo `useNotifications` — minta izin lalu tampilkan notifikasi lokal. Susun ju
   <NotificationsDemo />
 </ClientOnly>
 
+## Cara mencoba
+
+1. **Minta izin** — klik *Minta Izin*; badge `permission` berubah reaktif mengikuti pilihanmu di dialog browser.
+2. **Kirim notifikasi** — setelah `granted`, susun judul & isi lalu klik *Tampilkan Notifikasi*; periksa pojok layar / notification center OS.
+3. **Coba blokir** — kalau izin `denied`, demo menampilkan petunjuk pemulihan; ubah izin lewat pengaturan situs (ikon gembok) dan lihat badge ikut berubah tanpa muat ulang.
+
 ## Kode sumber
 
 ```vue

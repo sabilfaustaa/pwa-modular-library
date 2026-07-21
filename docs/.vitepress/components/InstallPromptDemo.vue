@@ -31,6 +31,12 @@ async function handleInstall(): Promise<void> {
     </p>
     <p v-if="lastResult" class="demo-result">
       Hasil prompt terakhir: <strong>{{ lastResult }}</strong>
+      <template v-if="lastResult === 'accepted'"> — user menyetujui instalasi.</template>
+      <template v-else-if="lastResult === 'dismissed'">
+        — user menutup dialog. Prompt hangus setelah sekali dipakai; browser perlu memicu ulang
+        <code>beforeinstallprompt</code>.
+      </template>
+      <template v-else> — prompt tidak tersedia (belum ada deferred prompt yang tertangkap).</template>
     </p>
   </div>
 </template>

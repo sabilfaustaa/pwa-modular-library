@@ -144,3 +144,58 @@
   white-space: pre;
   margin: 0;
 }
+
+/* Penomoran urutan rule (prioritas first-match wins). */
+ol.demo-list {
+  counter-reset: rule;
+}
+ol.demo-list li::before {
+  counter-increment: rule;
+  content: counter(rule);
+  flex: 0 0 auto;
+  color: var(--vp-c-text-3);
+  font-size: 0.75rem;
+  min-width: 1.1rem;
+}
+ol.demo-list li {
+  justify-content: flex-start;
+  align-items: center;
+}
+ol.demo-list li a {
+  margin-left: auto;
+}
+
+/* Baris rule yang cocok pada penguji URL. */
+.demo-list li.demo-hit {
+  background: var(--vp-c-green-soft);
+}
+
+.demo-dim {
+  color: var(--vp-c-text-3);
+  font-style: normal;
+  font-size: 0.75rem;
+}
+
+/* Pilihan mode (radio) & baris opsi generateSW. */
+.demo-radio {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.demo-opt {
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.demo-opt code {
+  font-size: 0.8rem;
+}
+
+/* Blok hasil yang bisa dilipat. */
+.demo-details summary {
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}

@@ -7,12 +7,26 @@ import { generateSW } from "pwa-modular-library";
 import { writeFileSync } from "node:fs";
 
 const rules = [
-  { pattern: "/api/*", strategy: "network-first", cacheName: "api-cache" },
-  { pattern: "/assets/*", strategy: "cache-first", cacheName: "asset-cache" },
+  { pattern: "*/api/*", strategy: "network-first", cacheName: "api-cache" },
+  { pattern: "*/assets/*", strategy: "cache-first", cacheName: "asset-cache" },
 ];
 
 writeFileSync("public/sw.js", generateSW(rules));
 ```
+
+## Bentuk `pattern` pada `generateSW`
+
+Dua jebakan yang sama-sama berakhir **cache diam-diam kosong**:
+
+1. **Pola string ter-anchor ke URL penuh.** `*` menjadi `.*`, lalu diuji sebagai `^<pola>$` terhadap URL utuh. Jadi `"/assets/*"` **tidak pernah** cocok dengan `https://host/assets/app.js`; yang benar `"*/assets/*"`.
+2. **`RegExp` tidak bertahan di mode static embed.** `generateSW(rules)` menyisipkan rules lewat `JSON.stringify`, dan `RegExp` tidak punya `toJSON` — hasilnya `"pattern": {}` di dalam `sw.js`, yang tidak cocok dengan URL apa pun.
+
+| Mode | Pola string ter-anchor | `RegExp` |
+|---|---|---|
+| `generateSW(rules)` — static embed *(default)* | ✅ | ❌ hancur menjadi `{}` |
+| `generateSW([], { kirimRulesViaPostMessage: true })` | ✅ | ✅ — rules dikirim via structured clone |
+
+Karena itu contoh di halaman ini memakai pola string ter-anchor. Untuk aturan yang dikelola `useCacheConfig()`, `RegExp` aman — lihat [§2 Bentuk `pattern`](/cache#_2-bentuk-pattern-anchoring-batasan).
 
 ## Tanda tangan
 
@@ -66,8 +80,8 @@ import { generateSW } from "pwa-modular-library";
 import { writeFileSync } from "node:fs";
 
 const rules = [
-  { pattern: "/api/*",    strategy: "network-first", cacheName: "api-cache" },
-  { pattern: "/assets/*", strategy: "cache-first",   cacheName: "asset-cache" },
+  { pattern: "*/api/*",    strategy: "network-first", cacheName: "api-cache" },
+  { pattern: "*/assets/*", strategy: "cache-first",   cacheName: "asset-cache" },
 ];
 
 const code = generateSW(rules, {

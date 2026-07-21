@@ -85,16 +85,18 @@ Library **tidak** membuat berkas SW secara otomatis. Anda perlu menghasilkan ber
 
 ```ts
 // scripts/generate-sw.ts
-import { generateSW } from "pwa-modular-library/sw";
+import { generateSW } from "pwa-modular-library";
 import fs from "node:fs";
 
 const swCode = generateSW([
-  { pattern: "/api/*", strategy: "network-first" },
-  { pattern: "/assets/*", strategy: "cache-first", maxEntries: 100 },
+  { pattern: "*/api/*", strategy: "network-first" },
+  { pattern: "*/assets/*", strategy: "cache-first" },
 ]);
 
 fs.writeFileSync("public/sw.js", swCode, "utf-8");
 ```
+
+> **Pola diawali `*` bukan salah ketik.** Pola string dicocokkan ter-anchor ke URL **penuh**, sehingga `"/assets/*"` tidak pernah cocok dengan `https://host/assets/app.js`. Untuk `generateSW`, pakai pola string ter-anchor — `RegExp` tidak bertahan pada mode static embed. Rinciannya di [§2 Bentuk `pattern`](./cache.md#_2-bentuk-pattern-anchoring-batasan).
 
 Atau buat berkas SW secara manual yang mengimpor library:
 
@@ -111,7 +113,9 @@ self.addEventListener("message", (event) => {
 
 ## 5. Dukungan Browser
 
-Library menggunakan pendekatan **progressive enhancement**. Setiap composable memiliki properti `isSupported` yang bernilai `false` jika fitur tidak didukung browser.
+Library menggunakan pendekatan **progressive enhancement**. `useNotifications()` dan `useInstallPrompt()` memaparkan properti `isSupported` yang bernilai `false` jika fitur tidak didukung browser.
+
+Composable lain fail gracefully **tanpa** `isSupported`: `usePWA()` membiarkan `isRegistered` tetap `false` dan mengirim error ke callback `onError`, sedangkan `useCacheConfig()` tetap menyimpan aturan di memori tanpa efek pada Service Worker.
 
 Lihat [browser-support.md](./browser-support.md) untuk matriks dukungan lengkap.
 

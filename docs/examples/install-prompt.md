@@ -8,6 +8,12 @@ Demo `useInstallPrompt` — orkestrasi *Add to Home Screen*. Composable menangka
   <InstallPromptDemo />
 </ClientOnly>
 
+## Cara mencoba
+
+1. **Amati badge** — di lingkungan docs, `canPrompt` umumnya `false`; demo menjelaskan alasannya (kriteria PWA belum terpenuhi di situs ini).
+2. **Coba di aplikasi nyata** — jalankan aplikasi PWA-mu (HTTPS + manifest valid + SW aktif) di Chrome/Edge; saat `beforeinstallprompt` tertangkap, `canPrompt` menjadi `true` dan tombol aktif.
+3. **Klik Install** — hasil `prompt()` (`accepted` / `dismissed` / `unavailable`) tampil beserta penjelasannya; prompt hangus setelah sekali dipakai.
+
 ## Kode sumber
 
 ```vue

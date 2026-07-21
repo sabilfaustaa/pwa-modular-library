@@ -55,7 +55,6 @@ const { isRegistered, hasUpdate, isOnline } = usePWA({
 
 <template>
   <div>
-    <p v-if="!isSupported">Service Worker tidak didukung pada browser ini.</p>
     <p v-if="isRegistered">✅ Service Worker aktif</p>
     <p v-if="hasUpdate">🔄 Pembaruan tersedia — muat ulang halaman</p>
     <p v-if="!isOnline">⚠️ Offline</p>
@@ -100,12 +99,14 @@ import { generateSW } from "pwa-modular-library";
 import { writeFileSync } from "node:fs";
 
 const rules = [
-  { pattern: "/api/*", strategy: "network-first", cacheName: "api-cache" },
-  { pattern: "/assets/*", strategy: "cache-first", cacheName: "asset-cache" },
+  { pattern: "*/api/*", strategy: "network-first", cacheName: "api-cache" },
+  { pattern: "*/assets/*", strategy: "cache-first", cacheName: "asset-cache" },
 ];
 
 writeFileSync("public/sw.js", generateSW(rules));
 ```
+
+> **Pola string harus ter-anchor.** Pola dicocokkan sebagai `^<pola>$` terhadap URL **penuh**, jadi `"/assets/*"` tidak pernah cocok dengan `https://host/assets/app.js` — cache akan diam-diam kosong. Pada mode static embed di atas, `RegExp` **tidak** bisa dipakai: rules di-serialisasi via `JSON.stringify` sehingga `RegExp` menjadi `{}`. Lihat [§2 Bentuk `pattern`](./cache.md#_2-bentuk-pattern-anchoring-batasan).
 
 ### Dua mode
 

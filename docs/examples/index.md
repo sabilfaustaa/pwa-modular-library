@@ -1,6 +1,6 @@
 # Contoh Interaktif
 
-Kumpulan demo langsung (live) yang menunjukkan setiap composable & utilitas library bekerja di peramban. Tiap contoh menyertakan kode sumber yang bisa langsung disalin.
+Kumpulan demo langsung (live) yang menunjukkan setiap composable & utilitas library bekerja di peramban. Tiap halaman menyertakan langkah **"Cara mencoba"** untuk menjalankan skenario menariknya (offline → online, retry & backoff, jebakan pattern) plus kode sumber yang bisa langsung disalin.
 
 > Demo dijalankan sepenuhnya di sisi klien (`<ClientOnly>`) dan **fail gracefully** — jika peramban tidak mendukung suatu fitur, demo tetap tampil dengan flag `isSupported`.
 
