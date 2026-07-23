@@ -7,6 +7,8 @@ export default defineConfig({
   description:
     "Library modular Vue 3 + TypeScript untuk akselerasi implementasi Progressive Web Apps pada sistem dengan keterbatasan konektivitas.",
   lang: "id-ID",
+  // GitHub Pages project sites are served below the repository name.
+  base: "/pwa-modular-library/",
   lastUpdated: true,
   cleanUrls: true,
 
